@@ -1,0 +1,26 @@
+# Production Configuration (DO NOT COMMIT THIS FILE)
+# Copy this and fill in your actual production values
+# This file should be set via environment variables or a secrets manager, NOT in git
+
+# Database
+spring.datasource.url=jdbc:mysql://your-prod-db-host:3306/roommatefinder_prod
+spring.datasource.driverClassName=com.mysql.cj.jdbc.Driver
+spring.datasource.username=${DB_USERNAME}
+spring.datasource.password=${DB_PASSWORD}
+
+# JPA / Hibernate
+spring.jpa.hibernate.ddl-auto=validate
+spring.jpa.show-sql=false
+spring.jpa.properties.hibernate.format_sql=false
+
+# JWT Configuration - USE ENVIRONMENT VARIABLES
+jwt.secret=${JWT_SECRET}
+jwt.expiration=${JWT_EXPIRATION}
+
+# Logging
+logging.level.root=WARN
+logging.level.com.mates.roommatefinder=INFO
+
+# Server
+server.port=8080
+server.servlet.context-path=/api

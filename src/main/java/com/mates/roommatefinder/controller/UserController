@@ -1,0 +1,19 @@
+@RestController
+@RequestMapping("/users")
+@RequiredArgsConstructor
+public class UserController {
+
+    private final UserService userService;
+    /*register
+    creates a user */
+    @PostMapping("/register")
+    public UserResponseDTO register(@RequestBody UserRequestDTO dto) {
+        return userService.createUser(dto);
+    }
+    /*login
+    logs in the user */
+    @PostMapping("/login")
+    public String login(@RequestParam String email, @RequestParam String password) {
+        return userService.login(email, password);
+    }
+}

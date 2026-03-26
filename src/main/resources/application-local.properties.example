@@ -1,0 +1,22 @@
+# Local Development Configuration
+# IMPORTANT: Copy this file to application-local.properties and add your own values
+# application-local.properties will be ignored by git (see .gitignore)
+
+# Datasource - Local MySQL (optional, default is H2)
+# spring.datasource.url=jdbc:mysql://localhost:3306/roommatefinder_dev
+# spring.datasource.driverClassName=com.mysql.cj.jdbc.Driver
+# spring.datasource.username=root
+# spring.datasource.password=your_local_password
+
+# JPA / Hibernate
+spring.jpa.hibernate.ddl-auto=create-drop
+spring.jpa.show-sql=true
+spring.jpa.properties.hibernate.format_sql=true
+
+# JWT Configuration (use strong secrets in production)
+jwt.secret=dev-secret-key-minimum-32-characters-long-for-development
+jwt.expiration=86400000
+
+# Logging
+logging.level.root=INFO
+logging.level.com.mates.roommatefinder=DEBUG
