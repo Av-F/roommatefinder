@@ -44,6 +44,6 @@ public class Profile {
     private String city;
 
     @OneToOne
-    @JoinColumn(name = "user_id", nullable = false)
+    @JoinColumn(name = "user_id", nullable = true) //set to false after testing
     private User user;    
 }

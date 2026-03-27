@@ -3,15 +3,14 @@ package com.mates.roommatefinder.controller;
 import java.util.List;
 
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.mates.roommatefinder.dto.ProfileRequestDTO;
-import com.mates.roommatefinder.dto.ProfileResponseDTO;
-import com.mates.roommatefinder.service.ProfileService;
+import com.mates.roommatefinder.model.Profile;
+import com.mates.roommatefinder.repository.ProfileRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -20,23 +19,26 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class ProfileController {
 
-    private final ProfileService profileService;
-    /*create
-    @param profileRequestDTO
-    creates the profile with given DTO */
+    private final ProfileRepository profileRepository;
+
     @PostMapping
-    public ProfileResponseDTO create(@RequestBody ProfileRequestDTO dto) {
-        return profileService.createProfile(dto);
+    public Profile createProfile(@RequestBody Profile profile) {
+        return profileRepository.save(profile);
     }
-    /*search
-    gives list of profiles based on given parameters */
-    @GetMapping("/search")
-    public List<ProfileResponseDTO> search(
-            @RequestParam(required = false) String city,
-            @RequestParam(required = false) Integer minAge,
-            @RequestParam(required = false) Integer maxAge,
-            @RequestParam(required = false) String lookingForOption
-    ) {
-        return profileService.searchProfiles(city, minAge, maxAge, lookingForOption);
+
+    @GetMapping
+    public List<Profile> getAllProfiles() {
+        return profileRepository.findAll();
+    }
+
+    @GetMapping("/{id}")
+    public Profile getProfile(@PathVariable Long id) {
+        return profileRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Profile not found"));
+    }
+
+    @GetMapping("/city/{city}")
+    public List<Profile> getProfilesByCity(@PathVariable String city) {
+        return profileRepository.findByCity(city);
     }
 }

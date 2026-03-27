@@ -1,19 +1,39 @@
+package com.mates.roommatefinder.controller;
+
+import java.util.List;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.mates.roommatefinder.model.Profile;
+import com.mates.roommatefinder.repository.ProfileRepository;
+
+import lombok.RequiredArgsConstructor;
+
 @RestController
 @RequestMapping("/users")
 @RequiredArgsConstructor
 public class UserController {
 
-    private final UserService userService;
-    /*register
-    creates a user */
-    @PostMapping("/register")
-    public UserResponseDTO register(@RequestBody UserRequestDTO dto) {
-        return userService.createUser(dto);
+    private final UserRepository userRepository;
+
+    @PostMapping
+    public User createUser(@RequestBody User user) {
+        return userRepository.save(user);
     }
-    /*login
-    logs in the user */
-    @PostMapping("/login")
-    public String login(@RequestParam String email, @RequestParam String password) {
-        return userService.login(email, password);
+
+    @GetMapping
+    public List<User> getAllUsers() {
+        return userRepository.findAll();
+    }
+
+    @GetMapping("/{id}")
+    public User getUser(@PathVariable Long id) {
+        return userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("User not found"));
     }
 }
