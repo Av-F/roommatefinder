@@ -1,6 +1,7 @@
 package com.mates.roommatefinder.service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import com.mates.roommatefinder.dto.ProfileResponseDTO;
 import com.mates.roommatefinder.model.Match;
@@ -19,11 +20,10 @@ import org.springframework.stereotype.Service;
 public class MatchService {
 
     private final MatchRepository matchRepository;
-    private final UserRepository userRepository;
     private final ProfileRepository profileRepository;
+    private final UserRepository userRepository;
 
     public List<ProfileResponseDTO> getMatches(Long userId) {
-
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
@@ -36,10 +36,10 @@ public class MatchService {
                             : match.getUser1();
 
                     Profile profile = profileRepository.findById(otherUser.getId())
-                            .orElseThrow();
+                            .orElseThrow(() -> new RuntimeException("Profile not found"));
 
                     return ProfileResponseDTO.fromProfile(profile);
                 })
-                .toList();
+                .collect(Collectors.toList());
     }
 }

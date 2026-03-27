@@ -7,13 +7,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.mates.roommatefinder.dto.ProfileResponseDTO;
+import com.mates.roommatefinder.model.Match;
 import com.mates.roommatefinder.model.Profile;
 import com.mates.roommatefinder.model.Swipe;
 import com.mates.roommatefinder.model.User;
 import com.mates.roommatefinder.repository.ProfileRepository;
 import com.mates.roommatefinder.repository.SwipeRepository;
 import com.mates.roommatefinder.repository.UserRepository;
-
+import com.mates.roommatefinder.repository.MatchRepository;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -23,47 +24,42 @@ public class SwipeService {
     private final SwipeRepository swipeRepository;
     private final UserRepository userRepository;
     private final ProfileRepository profileRepository;
+    private final MatchRepository matchRepository;
 
     /**
-     * Get a list of profiles the user can swipe on (same city, not already swiped)
+     * Get a list of profiles the user can swipe on:
+     *  • same city
+     *  • excluding self
+     *  • excluding already swiped users
      */
     public List<ProfileResponseDTO> getSwipeableProfiles(Long userId) {
+        // Fetch user
         User swiper = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        Profile swiperProfile = profileRepository.findById(swiper.getId())
+        // Fetch swiper's profile
+        Profile swiperProfile = profileRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("Profile not found"));
 
-        // All users in the same city
-        List<User> sameCityUsers = userRepository.findAll().stream()
-                .filter(u -> !u.getId().equals(userId)) // exclude self
-                .filter(u -> {
-                    Profile profile = profileRepository.findById(u.getId()).orElse(null);
-                    return profile != null && profile.getCity().equals(swiperProfile.getCity());
-                })
+        // Fetch all profiles in same city (except the calling user)
+        List<Profile> cityProfiles = profileRepository.findByCityAndIdNot(swiperProfile.getCity(), userId);
+
+        // Find IDs the user has already swiped on
+        List<Long> swipedIds = swipeRepository.findBySwiper(swiper).stream()
+                .map(swipe -> swipe.getTarget().getId())
                 .collect(Collectors.toList());
 
-        // Remove users already swiped on
-        List<Swipe> swipesByUser = swipeRepository.findBySwiper(swiper);
-        List<Long> swipedIds = swipesByUser.stream()
-                .map(s -> s.getTarget().getId())
-                .toList();
-
-        List<User> toSwipe = sameCityUsers.stream()
-                .filter(u -> !swipedIds.contains(u.getId()))
+        // Filter out profiles already swiped on
+        List<Profile> available = cityProfiles.stream()
+                .filter(p -> !swipedIds.contains(p.getId()))
                 .collect(Collectors.toList());
 
-        // Map to ProfileResponseDTO
-        return toSwipe.stream()
-                .map(u -> profileRepository.findById(u.getId())
-                        .orElseThrow(() -> new RuntimeException("Profile not found")))
+        // Convert to DTO
+        return available.stream()
                 .map(ProfileResponseDTO::fromProfile)
-                .toList();
+                .collect(Collectors.toList());
     }
 
-    /**
-     * Swipe on a user (like or pass)
-     */
     @Transactional
     public void swipe(Long swiperId, Long targetId, boolean liked) {
         User swiper = userRepository.findById(swiperId)
@@ -83,15 +79,30 @@ public class SwipeService {
                 .build();
 
         swipeRepository.save(swipe);
+
+        // Check for match
+        if (liked) {
+            boolean targetLikedSwiper = swipeRepository.findBySwiperAndTarget(target, swiper).stream()
+                    .anyMatch(Swipe::getLiked);
+
+            // Only create match if both like each other and match does not exist
+            if (targetLikedSwiper && !matchRepository.existsByUser1AndUser2(swiper, target) 
+                && !matchRepository.existsByUser1AndUser2(target, swiper)) {
+
+                Match match = Match.builder()
+                        .user1(swiper)
+                        .user2(target)
+                        .build();
+
+                matchRepository.save(match);
+            }
+        }
     }
 
-    /**
-     * Check if a match exists (both liked each other)
-     */
-    public boolean isMatch(Long userId1, Long userId2) {
-        User user1 = userRepository.findById(userId1)
+    public boolean isMatch(Long user1Id, Long user2Id) {
+        User user1 = userRepository.findById(user1Id)
                 .orElseThrow(() -> new RuntimeException("User not found"));
-        User user2 = userRepository.findById(userId2)
+        User user2 = userRepository.findById(user2Id)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         boolean user1Liked2 = swipeRepository.findBySwiperAndTarget(user1, user2).stream()

@@ -11,9 +11,9 @@ import com.mates.roommatefinder.model.User;
 @Repository
 public interface SwipeRepository extends JpaRepository<Swipe, Long> {
 
-    List<Swipe> findBySwiper(User swiper);
-
     List<Swipe> findByTarget(User target);
+
+    List<Swipe> findBySwiper(User swiper);
 
     List<Swipe> findBySwiperAndTarget(User swiper, User target);
 }

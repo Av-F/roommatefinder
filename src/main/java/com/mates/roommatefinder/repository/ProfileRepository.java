@@ -10,4 +10,5 @@ public interface ProfileRepository extends JpaRepository<Profile, Long> {
     List<Profile> findByCity(String city);
     List<Profile> findByAgeBetween(Integer minAge, Integer maxAge);
     List<Profile> findByLookingForOption(String lookingForOption);
+    List<Profile> findByCityAndIdNot(String city, Long idToExclude);
 }

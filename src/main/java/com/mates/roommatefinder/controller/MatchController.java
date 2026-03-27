@@ -7,24 +7,23 @@ import com.mates.roommatefinder.service.MatchService;
 
 import lombok.RequiredArgsConstructor;
 
-import org.springframework.http.ResponseEntity;
+
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
+@RequestMapping("/api/matches")
 @RequiredArgsConstructor
 public class MatchController {
 
     private final MatchService matchService;
 
-    /**
-     * GET /api/matches?userId=1
-     * Returns all matched profiles for a user
-     */
-    @GetMapping("/api/matches")
-    public ResponseEntity<List<ProfileResponseDTO>> getMatches(@RequestParam Long userId) {
-        List<ProfileResponseDTO> matches = matchService.getMatches(userId);
-        return ResponseEntity.ok(matches);
+    // List matches for a user
+    @GetMapping("/{userId}")
+    public List<ProfileResponseDTO> getMatches(@PathVariable Long userId) {
+        return matchService.getMatches(userId);
     }
 }
