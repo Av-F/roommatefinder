@@ -11,6 +11,7 @@ import com.mates.roommatefinder.model.Match;
 import com.mates.roommatefinder.model.Profile;
 import com.mates.roommatefinder.model.Swipe;
 import com.mates.roommatefinder.model.User;
+import com.mates.roommatefinder.repository.MatchRepository;
 import com.mates.roommatefinder.repository.ProfileRepository;
 import com.mates.roommatefinder.repository.SwipeRepository;
 import com.mates.roommatefinder.repository.UserRepository;
