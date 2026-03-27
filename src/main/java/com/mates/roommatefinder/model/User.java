@@ -1,10 +1,13 @@
 package com.mates.roommatefinder.model;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -19,22 +22,21 @@ import lombok.ToString;
 @ToString(exclude = "password")
 @Table(name = "users")
 public class User {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Size(min=3)
-    @NotNull(message="Username can not be null.")
-    @NotBlank(message = "Username can not be blank.")
     private String username;
-    
-    @NotNull(message="Email can not be null.")
-    @NotBlank(message = "Email can not be blank.")
-    @Column(unique = true)
     private String email;
-    
-    @Size(min = 6, message = "Password must be at least six characters long." )
-    @NotNull(message="Password can not be null.")
-    @NotBlank(message = "Password can not be blank.")
     private String password;
+
+    // Link to Profile
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private Profile profile;
+
+    // Convenience getter
+    public Profile getProfile() {
+        return profile;
+    }
 }
