@@ -13,7 +13,6 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
-
 @Entity
 @Getter
 @Setter
@@ -24,22 +23,22 @@ public class Profile {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank(message="name can not be blank")
+    @NotBlank(message="Name cannot be blank")
     private String name;
 
-    @NotBlank(message="option can not be blank")
+    @NotBlank(message="LookingForOption cannot be blank")
     private String lookingForOption;
-    
-    @NotBlank(message="Bio can not be blank")
+
+    @NotBlank(message="Bio cannot be blank")
     private String bio;
 
-    @NotNull(message="age can not be blank")
+    @NotNull(message="Age cannot be blank")
     private Integer age;
 
-    @NotBlank(message="city can not be blank")
+    @NotBlank(message="City cannot be blank")
     private String city;
 
     @ManyToOne
     @JoinColumn(name = "user_id", referencedColumnName = "id")
-    private User user;
+    private User user; // Link to the existing user
 }

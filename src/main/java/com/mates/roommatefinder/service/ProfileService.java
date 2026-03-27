@@ -21,39 +21,38 @@ public class ProfileService {
     private final ProfileRepository profileRepository;
     private final UserRepository userRepository;
 
-    public ProfileResponseDTO createProfile(ProfileDTO dto) {
-    // fetch user by ID
-    User user = userRepository.findById(dto.getId()) // make sure ProfileDTO has userId
-            .orElseThrow(() -> new RuntimeException("User not found"));
+    public Profile createProfile(ProfileDTO dto) {
+        // Find the user by ID
+        User user = userRepository.findById(dto.getUserId())
+                .orElseThrow(() -> new RuntimeException("User not found with ID: " + dto.getUserId()));
 
-    // build profile entity
-    Profile profile = Profile.builder()
-            .name(dto.getName())
-            .lookingForOption(dto.getLookingForOption())
-            .bio(dto.getBio())
-            .age(dto.getAge())
-            .city(dto.getCity())
-            .user(user)
-            .build();
+        // Build the profile
+        Profile profile = Profile.builder()
+                .name(dto.getName())
+                .lookingForOption(dto.getLookingForOption())
+                .bio(dto.getBio())
+                .age(dto.getAge())
+                .city(dto.getCity())
+                .user(user) // Link user
+                .build();
 
-    Profile savedProfile = profileRepository.save(profile);
-
-    // convert to DTO before returning
-    return toDTO(savedProfile);
-}
-
-    public ProfileResponseDTO toDTO(Profile profile) {
-    return ProfileResponseDTO.builder()
-            .id(profile.getId())
-            .name(profile.getName())
-            .lookingForOption(profile.getLookingForOption())
-            .bio(profile.getBio())
-            .age(profile.getAge())
-            .city(profile.getCity())
-            .userId(profile.getUser() != null ? profile.getUser().getId() : null)
-            .build();
+        return profileRepository.save(profile);
     }
 
+    // Convert Profile to DTO
+    public ProfileResponseDTO toDTO(Profile profile) {
+        return ProfileResponseDTO.builder()
+                .id(profile.getId())
+                .name(profile.getName())
+                .lookingForOption(profile.getLookingForOption())
+                .bio(profile.getBio())
+                .age(profile.getAge())
+                .city(profile.getCity())
+                .userId(profile.getUser() != null ? profile.getUser().getId() : null)
+                .build();
+    }
+
+    // Retrieve all profiles
     public List<ProfileResponseDTO> getAllProfilesDTO() {
         return profileRepository.findAll()
                 .stream()
@@ -61,13 +60,17 @@ public class ProfileService {
                 .collect(Collectors.toList());
     }
 
+    // Retrieve a specific profile by ID
     public ProfileResponseDTO getProfileDTO(Long id) {
-    if (id == null) {
-        throw new IllegalArgumentException("Profile ID cannot be null");
-    }
+        if (id == null) {
+            throw new IllegalArgumentException("Profile ID cannot be null");
+        }
 
-    return profileRepository.findById(id)
-            .map(this::toDTO) // convert entity to DTO
-            .orElseThrow(() -> new RuntimeException("Profile not found with ID: " + id));
+        return profileRepository.findById(id)
+                .map(this::toDTO)
+                .orElseThrow(() -> new RuntimeException("Profile not found with ID: " + id));
     }
+    
+
+
 }

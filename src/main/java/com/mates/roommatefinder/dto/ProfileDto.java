@@ -2,30 +2,33 @@ package com.mates.roommatefinder.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @Builder
 public class ProfileDTO {
-
-    @NotBlank(message="Name can not be blank")
+    @NotBlank(message="Name cannot be blank")
     private String name;
 
-    @NotBlank(message="LookingForOption can not be blank")
+    @NotBlank(message="LookingForOption cannot be blank")
     private String lookingForOption;
 
-    @NotBlank(message="Bio can not be blank")
+    @NotBlank(message="Bio cannot be blank")
     private String bio;
 
-    @NotNull(message="Age can not be blank")
+    @NotNull(message="Age cannot be blank")
     private Integer age;
 
-    @NotBlank(message="City can not be blank")
+    @NotBlank(message="City cannot be blank")
     private String city;
 
-    @NotNull(message="id can not be null")
-    private Long id;
+    @NotNull(message="UserId cannot be null")
+    private Long userId; // Pass existing user ID
 }
