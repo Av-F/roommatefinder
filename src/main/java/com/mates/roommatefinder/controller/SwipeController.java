@@ -1,16 +1,9 @@
 package com.mates.roommatefinder.controller;
 
-import java.util.List;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
-import com.mates.roommatefinder.model.Swipe;
-import com.mates.roommatefinder.repository.SwipeRepository;
+import com.mates.roommatefinder.service.SwipeService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -19,21 +12,15 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class SwipeController {
 
-    private final SwipeRepository swipeRepository;
+    private final SwipeService swipeService;
 
-    @PostMapping("/create")
-    public Swipe createSwipe(@RequestBody Swipe swipe) {
-        return swipeRepository.save(swipe);
-    }
+    @PostMapping
+    public ResponseEntity<String> swipe(
+            @RequestParam Long swiperId,
+            @RequestParam Long targetId,
+            @RequestParam boolean liked) {
 
-    @GetMapping
-    public List<Swipe> getAllSwipes() {
-        return swipeRepository.findAll();
-    }
-
-    @GetMapping("/{id}")
-    public Swipe getSwipe(@PathVariable Long id) {
-        return swipeRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Swipe not found"));
+        swipeService.swipe(swiperId, targetId, liked);
+        return ResponseEntity.ok("Swipe recorded");
     }
 }
