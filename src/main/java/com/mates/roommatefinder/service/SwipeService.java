@@ -14,7 +14,7 @@ import com.mates.roommatefinder.model.User;
 import com.mates.roommatefinder.repository.ProfileRepository;
 import com.mates.roommatefinder.repository.SwipeRepository;
 import com.mates.roommatefinder.repository.UserRepository;
-import com.mates.roommatefinder.repository.MatchRepository;
+
 import lombok.RequiredArgsConstructor;
 
 @Service
