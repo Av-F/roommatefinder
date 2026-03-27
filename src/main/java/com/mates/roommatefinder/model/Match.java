@@ -1,15 +1,8 @@
 package com.mates.roommatefinder.model;
 
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import jakarta.persistence.*;
+import lombok.*;
+
 @Entity
 @Getter
 @Setter
@@ -23,8 +16,10 @@ public class Match {
     private Long id;
 
     @ManyToOne
+    @JoinColumn(name = "user1_id")
     private User user1;
 
     @ManyToOne
+    @JoinColumn(name = "user2_id")
     private User user2;
 }

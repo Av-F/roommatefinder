@@ -1,8 +1,10 @@
 package com.mates.roommatefinder.controller;
 
-import org.springframework.http.ResponseEntity;
+import java.util.List;
+
 import org.springframework.web.bind.annotation.*;
 
+import com.mates.roommatefinder.dto.ProfileResponseDTO;
 import com.mates.roommatefinder.service.SwipeService;
 
 import lombok.RequiredArgsConstructor;
@@ -14,13 +16,23 @@ public class SwipeController {
 
     private final SwipeService swipeService;
 
-    @PostMapping
-    public ResponseEntity<String> swipe(
-            @RequestParam Long swiperId,
-            @RequestParam Long targetId,
-            @RequestParam boolean liked) {
+    // Get swipeable profiles
+    @GetMapping("/{userId}")
+    public List<ProfileResponseDTO> getSwipeableProfiles(@PathVariable Long userId) {
+        return swipeService.getSwipeableProfiles(userId);
+    }
 
+    // Swipe on a user
+    @PostMapping("/{swiperId}/{targetId}")
+    public void swipe(@PathVariable Long swiperId,
+                      @PathVariable Long targetId,
+                      @RequestParam boolean liked) {
         swipeService.swipe(swiperId, targetId, liked);
-        return ResponseEntity.ok("Swipe recorded");
+    }
+
+    // Check match
+    @GetMapping("/match/{user1}/{user2}")
+    public boolean checkMatch(@PathVariable Long user1, @PathVariable Long user2) {
+        return swipeService.isMatch(user1, user2);
     }
 }
