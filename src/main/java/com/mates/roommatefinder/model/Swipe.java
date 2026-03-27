@@ -1,17 +1,16 @@
 package com.mates.roommatefinder.model;
 
-import java.time.LocalDateTime;
-
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.ToString;
 
 @Entity
 @Getter
@@ -19,18 +18,21 @@ import lombok.ToString;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@ToString
 public class Swipe {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Long swiperUserId;   // who is swiping
-    private Long swipedUserId;   // who is being swiped on
+    // Who is swiping
+    @ManyToOne
+    @JoinColumn(name = "swiper_id")
+    private User swiper;
 
-    private Boolean liked;       // true = like, false = pass
+    // Who is being swiped on
+    @ManyToOne
+    @JoinColumn(name = "target_id")
+    private User target;
 
-    private LocalDateTime timestamp;
-
+    private Boolean liked; // true = like, false = pass
 }

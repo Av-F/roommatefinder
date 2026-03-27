@@ -1,15 +1,18 @@
 package com.mates.roommatefinder.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.MapsId;
+import jakarta.persistence.OneToOne;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
@@ -17,28 +20,23 @@ import lombok.ToString;
 @Getter
 @Setter
 @Builder
+@NoArgsConstructor 
+@AllArgsConstructor 
 @ToString(exclude = "user")
 public class Profile {
+    
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long id; // same as user id
 
-    @NotBlank(message="Name cannot be blank")
+    @OneToOne
+    @MapsId // maps Profile.id to User.id
+    @JoinColumn(name = "id")
+    @JsonIgnore
+    private User user;
+
     private String name;
-
-    @NotBlank(message="LookingForOption cannot be blank")
-    private String lookingForOption;
-
-    @NotBlank(message="Bio cannot be blank")
     private String bio;
-
-    @NotNull(message="Age cannot be blank")
     private Integer age;
-
-    @NotBlank(message="City cannot be blank")
     private String city;
-
-    @ManyToOne
-    @JoinColumn(name = "user_id", referencedColumnName = "id")
-    private User user; // Link to the existing user
+    private String lookingForOption;
 }

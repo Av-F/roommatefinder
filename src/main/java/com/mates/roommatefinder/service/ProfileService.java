@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import com.mates.roommatefinder.dto.ProfileDTO;
 import com.mates.roommatefinder.dto.ProfileResponseDTO;
+import com.mates.roommatefinder.dto.ProfileUpdateDTO;
 import com.mates.roommatefinder.model.Profile;
 import com.mates.roommatefinder.model.User;
 import com.mates.roommatefinder.repository.ProfileRepository;
@@ -22,37 +23,39 @@ public class ProfileService {
     private final UserRepository userRepository;
 
     public Profile createProfile(ProfileDTO dto) {
-        // Find the user by ID
-        User user = userRepository.findById(dto.getUserId())
-                .orElseThrow(() -> new RuntimeException("User not found with ID: " + dto.getUserId()));
+    User user = userRepository.findById(dto.getUserId())
+            .orElseThrow(() -> new RuntimeException("User not found with ID: " + dto.getUserId()));
 
-        // Build the profile
-        Profile profile = Profile.builder()
-                .name(dto.getName())
-                .lookingForOption(dto.getLookingForOption())
-                .bio(dto.getBio())
-                .age(dto.getAge())
-                .city(dto.getCity())
-                .user(user) // Link user
-                .build();
-
-        return profileRepository.save(profile);
+    // Check if profile already exists
+    if (profileRepository.existsById(user.getId())) {
+        throw new RuntimeException("Profile already exists for user ID: " + user.getId());
     }
+
+    Profile profile = Profile.builder()
+            .user(user)
+            .name(dto.getName())
+            .lookingForOption(dto.getLookingForOption())
+            .bio(dto.getBio())
+            .age(dto.getAge())
+            .city(dto.getCity())
+            .build();
+
+    return profileRepository.save(profile);
+}
 
     // Convert Profile to DTO
     public ProfileResponseDTO toDTO(Profile profile) {
         return ProfileResponseDTO.builder()
-                .id(profile.getId())
                 .name(profile.getName())
                 .lookingForOption(profile.getLookingForOption())
                 .bio(profile.getBio())
                 .age(profile.getAge())
                 .city(profile.getCity())
-                .userId(profile.getUser() != null ? profile.getUser().getId() : null)
+                .id(profile.getUser() != null ? profile.getUser().getId() : null)
                 .build();
     }
 
-    // Retrieve all profiles
+        // Retrieve all profiles as DTOs
     public List<ProfileResponseDTO> getAllProfilesDTO() {
         return profileRepository.findAll()
                 .stream()
@@ -60,17 +63,29 @@ public class ProfileService {
                 .collect(Collectors.toList());
     }
 
-    // Retrieve a specific profile by ID
-    public ProfileResponseDTO getProfileDTO(Long id) {
-        if (id == null) {
-            throw new IllegalArgumentException("Profile ID cannot be null");
+    // Retrieve a specific profile by ID (same as user ID)
+    public ProfileResponseDTO getProfileDTO(Long userId) {
+        if (userId == null) {
+            throw new IllegalArgumentException("User ID cannot be null");
         }
 
-        return profileRepository.findById(id)
+        return profileRepository.findById(userId)
                 .map(this::toDTO)
-                .orElseThrow(() -> new RuntimeException("Profile not found with ID: " + id));
+                .orElseThrow(() -> new RuntimeException("Profile not found for user ID: " + userId));
     }
-    
 
+        public Profile updateProfile(Long userId, ProfileUpdateDTO dto) {
+        Profile profile = profileRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("Profile not found"));
+
+        // Only update fields that are not null
+        if (dto.getName() != null) profile.setName(dto.getName());
+        if (dto.getBio() != null) profile.setBio(dto.getBio());
+        if (dto.getAge() != null) profile.setAge(dto.getAge());
+        if (dto.getCity() != null) profile.setCity(dto.getCity());
+        if (dto.getLookingForOption() != null) profile.setLookingForOption(dto.getLookingForOption());
+
+        return profileRepository.save(profile);
+    }
 
 }
