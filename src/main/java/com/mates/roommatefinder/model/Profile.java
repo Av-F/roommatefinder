@@ -5,25 +5,21 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.OneToOne;
+import jakarta.persistence.ManyToOne;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+
 
 @Entity
 @Getter
 @Setter
-@NoArgsConstructor
-@AllArgsConstructor
 @Builder
 @ToString(exclude = "user")
 public class Profile {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -43,7 +39,7 @@ public class Profile {
     @NotBlank(message="city can not be blank")
     private String city;
 
-    @OneToOne
-    @JoinColumn(name = "user_id", nullable = true) //set to false after testing
-    private User user;    
+    @ManyToOne
+    @JoinColumn(name = "user_id", referencedColumnName = "id")
+    private User user;
 }

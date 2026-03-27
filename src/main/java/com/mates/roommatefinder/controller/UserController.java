@@ -9,24 +9,29 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.mates.roommatefinder.model.Profile;
-import com.mates.roommatefinder.repository.ProfileRepository;
+import com.mates.roommatefinder.model.User;
+import com.mates.roommatefinder.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/users")
+@RequestMapping("/api/users")
 @RequiredArgsConstructor
 public class UserController {
 
     private final UserRepository userRepository;
 
-    @PostMapping
+    @GetMapping("/test")
+    public String test() {
+        return "Controller reachable!";
+    }   
+
+    @PostMapping("/create")
     public User createUser(@RequestBody User user) {
         return userRepository.save(user);
     }
 
-    @GetMapping
+    @GetMapping("/retrieve")
     public List<User> getAllUsers() {
         return userRepository.findAll();
     }

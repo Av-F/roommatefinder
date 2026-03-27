@@ -1,11 +1,16 @@
 package com.mates.roommatefinder.service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
+import com.mates.roommatefinder.dto.ProfileDTO;
+import com.mates.roommatefinder.dto.ProfileResponseDTO;
 import com.mates.roommatefinder.model.Profile;
+import com.mates.roommatefinder.model.User;
 import com.mates.roommatefinder.repository.ProfileRepository;
+import com.mates.roommatefinder.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -14,42 +19,55 @@ import lombok.RequiredArgsConstructor;
 public class ProfileService {
 
     private final ProfileRepository profileRepository;
+    private final UserRepository userRepository;
 
-    // Create a profile
-    public Profile createProfile(Profile profile) {
-        return profileRepository.save(profile);
+    public ProfileResponseDTO createProfile(ProfileDTO dto) {
+    // fetch user by ID
+    User user = userRepository.findById(dto.getId()) // make sure ProfileDTO has userId
+            .orElseThrow(() -> new RuntimeException("User not found"));
+
+    // build profile entity
+    Profile profile = Profile.builder()
+            .name(dto.getName())
+            .lookingForOption(dto.getLookingForOption())
+            .bio(dto.getBio())
+            .age(dto.getAge())
+            .city(dto.getCity())
+            .user(user)
+            .build();
+
+    Profile savedProfile = profileRepository.save(profile);
+
+    // convert to DTO before returning
+    return toDTO(savedProfile);
+}
+
+    public ProfileResponseDTO toDTO(Profile profile) {
+    return ProfileResponseDTO.builder()
+            .id(profile.getId())
+            .name(profile.getName())
+            .lookingForOption(profile.getLookingForOption())
+            .bio(profile.getBio())
+            .age(profile.getAge())
+            .city(profile.getCity())
+            .userId(profile.getUser() != null ? profile.getUser().getId() : null)
+            .build();
     }
 
-    // Get all profiles
-    public List<Profile> getAllProfiles() {
-        return profileRepository.findAll();
+    public List<ProfileResponseDTO> getAllProfilesDTO() {
+        return profileRepository.findAll()
+                .stream()
+                .map(this::toDTO)
+                .collect(Collectors.toList());
     }
 
-    // Get profile by ID
-    public Profile getProfileById(Long id) {
-        return profileRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Profile not found"));
+    public ProfileResponseDTO getProfileDTO(Long id) {
+    if (id == null) {
+        throw new IllegalArgumentException("Profile ID cannot be null");
     }
 
-    // Get profiles by city
-    public List<Profile> getProfilesByCity(String city) {
-        return profileRepository.findByCity(city);
-    }
-
-    // Update a profile
-    public Profile updateProfile(Long id, Profile updatedProfile) {
-        Profile profile = getProfileById(id);
-        profile.setName(updatedProfile.getName());
-        profile.setBio(updatedProfile.getBio());
-        profile.setAge(updatedProfile.getAge());
-        profile.setCity(updatedProfile.getCity());
-        profile.setLookingForOption(updatedProfile.getLookingForOption());
-        profile.setUser(updatedProfile.getUser()); // optional for now
-        return profileRepository.save(profile);
-    }
-
-    // Delete a profile
-    public void deleteProfile(Long id) {
-        profileRepository.deleteById(id);
+    return profileRepository.findById(id)
+            .map(this::toDTO) // convert entity to DTO
+            .orElseThrow(() -> new RuntimeException("Profile not found with ID: " + id));
     }
 }

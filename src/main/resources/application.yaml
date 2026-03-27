@@ -20,6 +20,7 @@ server:
     username: ${SPRING_DATASOURCE_USERNAME:root}
     password: ${SPRING_DATASOURCE_PASSWORD:root}
 
-jwt:
-  secret: ${JWT_SECRET:supersecret}
-  expiration: 86400000   # 1 day in ms
+#jwt:
+  #secret: ${JWT_SECRET:supersecret}
+  #expiration: 86400000   # 1 day in ms
+  

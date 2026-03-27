@@ -9,36 +9,30 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.mates.roommatefinder.model.Profile;
-import com.mates.roommatefinder.repository.ProfileRepository;
+import com.mates.roommatefinder.dto.ProfileDTO;
+import com.mates.roommatefinder.dto.ProfileResponseDTO;
+import com.mates.roommatefinder.service.ProfileService;
 
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/profiles")
+@RequestMapping("api/profiles")
 @RequiredArgsConstructor
 public class ProfileController {
+    private final ProfileService profileService;
 
-    private final ProfileRepository profileRepository;
-
-    @PostMapping
-    public Profile createProfile(@RequestBody Profile profile) {
-        return profileRepository.save(profile);
+     @PostMapping("/create")
+    public ProfileResponseDTO createProfile(@RequestBody ProfileDTO profileDTO) {
+        return profileService.createProfile(profileDTO);
     }
 
-    @GetMapping
-    public List<Profile> getAllProfiles() {
-        return profileRepository.findAll();
+    @GetMapping("/retrieve")
+    public List<ProfileResponseDTO> getAllProfiles() {
+        return profileService.getAllProfilesDTO();
     }
 
     @GetMapping("/{id}")
-    public Profile getProfile(@PathVariable Long id) {
-        return profileRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Profile not found"));
-    }
-
-    @GetMapping("/city/{city}")
-    public List<Profile> getProfilesByCity(@PathVariable String city) {
-        return profileRepository.findByCity(city);
+    public ProfileResponseDTO getProfile(@PathVariable Long id) {
+        return profileService.getProfileDTO(id);
     }
 }
