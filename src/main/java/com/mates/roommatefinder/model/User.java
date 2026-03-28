@@ -1,7 +1,11 @@
 package com.mates.roommatefinder.model;
 
+import com.mates.roommatefinder.security.UserRole;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -34,6 +38,9 @@ public class User {
      @NotBlank(message = "Password is required")
     @NotNull(message = "Password cannot be null")
     private String password;
+
+    @Enumerated(EnumType.STRING)
+    private UserRole role = UserRole.USER;
 
     // Link to Profile
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)

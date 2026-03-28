@@ -1,8 +1,11 @@
 package com.mates.roommatefinder.security;
 
 import java.io.IOException;
+import java.util.Collections;
 
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
@@ -38,14 +41,19 @@ public class JwtFilter extends OncePerRequestFilter {
 
                 if (jwtUtils.validateJwtToken(token)) {
                     Long userId = jwtUtils.getUserIdFromJwt(token);
+                    UserRole role = jwtUtils.getRoleFromJwt(token);
                     
                     // Optional - user might not exist, but token is valid
                     var userOpt = userRepository.findById(userId);
                     
                     if (userOpt.isPresent()) {
                         User user = userOpt.get();
+                        
+                        // Create authority from role
+                        GrantedAuthority authority = new SimpleGrantedAuthority(role.getAuthority());
+                        
                         UsernamePasswordAuthenticationToken authentication = 
-                                new UsernamePasswordAuthenticationToken(user, null, null);
+                                new UsernamePasswordAuthenticationToken(user, null, Collections.singletonList(authority));
                         authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                         SecurityContextHolder.getContext().setAuthentication(authentication);
                     } else {

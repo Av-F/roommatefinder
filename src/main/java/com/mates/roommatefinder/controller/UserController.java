@@ -1,7 +1,10 @@
 package com.mates.roommatefinder.controller;
 
+import java.util.List;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -112,16 +115,24 @@ public class UserController {
     }
 
     /**
-     * Get all users (admin only - commented out for now)
-     * Uncomment and add @PreAuthorize("hasRole('ADMIN')") when role support is added
+     * Get all users for browsing/discovery
+     * ADMIN ONLY - Requires ROLE_ADMIN authority
+     * 
+     * PRODUCTION NOTE: In a production environment, you should consider:
+     * - Implementing pagination: @RequestParam(defaultValue="0") int page
+     * - Filtering by preferences/location
+     * - Rate limiting to prevent abuse
+     * - Caching expensive queries
      */
-    // @GetMapping("/retrieve")
-    // public List<User> getAllUsers() {
-    //     return userRepository.findAll();
-    // }
-
-    /**
-     * Create new user - handled by AuthController.register()
-     * Leaving as reference to discourage direct creation
-     */
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping("/retrieve")
+    public ResponseEntity<List<User>> getAllUsers() {
+        try {
+            List<User> users = userRepository.findAll();
+            return ResponseEntity.ok(users);
+        } catch (Exception e) {
+            log.error("Failed to retrieve users: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
 }

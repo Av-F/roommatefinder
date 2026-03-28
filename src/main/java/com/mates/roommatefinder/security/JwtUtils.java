@@ -28,18 +28,29 @@ public class JwtUtils {
     }
 
     /**
-     * Generate JWT token for a user
+     * Generate JWT token for a user with role
      * @param userId the user ID to encode in the token
+     * @param role the user's role
      * @return JWT token string
      */
-    public String generateJwtToken(Long userId) {
+    public String generateJwtToken(Long userId, UserRole role) {
         return Jwts.builder()
                 .setSubject(String.valueOf(userId))
+                .claim("role", role.toString())
                 .setIssuer(jwtIssuer)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + jwtExpirationMs))
                 .signWith(getSigningKey(), SignatureAlgorithm.HS256)
                 .compact();
+    }
+
+    /**
+     * Generate JWT token for a user (defaults to USER role)
+     * @param userId the user ID to encode in the token
+     * @return JWT token string
+     */
+    public String generateJwtToken(Long userId) {
+        return generateJwtToken(userId, UserRole.USER);
     }
 
     /**
@@ -55,6 +66,26 @@ public class JwtUtils {
                 .getBody()
                 .getSubject();
         return Long.parseLong(subject);
+    }
+
+    /**
+     * Extract role from JWT token
+     * @param token the JWT token
+     * @return the user's role
+     */
+    public UserRole getRoleFromJwt(String token) {
+        String roleStr = Jwts.parserBuilder()
+                .setSigningKey(getSigningKey())
+                .build()
+                .parseClaimsJws(token)
+                .getBody()
+                .get("role", String.class);
+        
+        try {
+            return UserRole.valueOf(roleStr);
+        } catch (Exception e) {
+            return UserRole.USER;
+        }
     }
 
     /**

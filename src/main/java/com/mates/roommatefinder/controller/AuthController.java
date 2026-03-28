@@ -41,8 +41,8 @@ public class AuthController {
             // Save user
             User savedUser = userRepository.save(user);
 
-            // Generate JWT
-            String token = jwtUtils.generateJwtToken(savedUser.getId());
+            // Generate JWT with role
+            String token = jwtUtils.generateJwtToken(savedUser.getId(), savedUser.getRole());
 
             return ResponseEntity.ok(new AuthResponse(token));
         } catch (Exception e) {
@@ -70,8 +70,8 @@ public class AuthController {
                         .body("Invalid credentials");
             }
 
-            // Generate JWT
-            String token = jwtUtils.generateJwtToken(user.getId());
+            // Generate JWT with role
+            String token = jwtUtils.generateJwtToken(user.getId(), user.getRole());
 
             return ResponseEntity.ok(new AuthResponse(token));
         } catch (Exception e) {
