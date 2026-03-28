@@ -16,9 +16,11 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class JwtFilter extends OncePerRequestFilter {
 
     private final JwtUtils jwtUtils;
@@ -30,20 +32,31 @@ public class JwtFilter extends OncePerRequestFilter {
 
         String authHeader = request.getHeader("Authorization");
 
-        if (authHeader != null && authHeader.startsWith("Bearer ")) {
-            String token = authHeader.substring(7);
+        try {
+            if (authHeader != null && authHeader.startsWith("Bearer ")) {
+                String token = authHeader.substring(7);
 
-            if (jwtUtils.validateJwtToken(token)) {
-                Long userId = jwtUtils.getUserIdFromJwt(token);
-                User user = userRepository.findById(userId)
-                        .orElseThrow(() -> new RuntimeException("User not found"));
-
-                UsernamePasswordAuthenticationToken authentication = 
-                        new UsernamePasswordAuthenticationToken(user, null, null); // no roles yet
-                authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-
-                SecurityContextHolder.getContext().setAuthentication(authentication);
+                if (jwtUtils.validateJwtToken(token)) {
+                    Long userId = jwtUtils.getUserIdFromJwt(token);
+                    
+                    // Optional - user might not exist, but token is valid
+                    var userOpt = userRepository.findById(userId);
+                    
+                    if (userOpt.isPresent()) {
+                        User user = userOpt.get();
+                        UsernamePasswordAuthenticationToken authentication = 
+                                new UsernamePasswordAuthenticationToken(user, null, null);
+                        authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                        SecurityContextHolder.getContext().setAuthentication(authentication);
+                    } else {
+                        log.warn("User not found for ID: {}", userId);
+                    }
+                } else {
+                    log.warn("Invalid JWT token");
+                }
             }
+        } catch (Exception e) {
+            log.error("JWT filter error: {}", e.getMessage());
         }
 
         filterChain.doFilter(request, response);

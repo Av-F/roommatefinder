@@ -1,26 +1,18 @@
 spring:
+  application:
+    name: roommatefinder
   datasource:
     url: jdbc:mysql://localhost:3306/roommate
     username: root
     password: root
+    driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
     hibernate:
-      ddl-auto: update      # automatically create tables
-    show-sql: true          # prints SQL to console
+      ddl-auto: update
+    show-sql: true
     properties:
       hibernate:
-        format_sql: true    # makes SQL readable
+        format_sql: true
 
 server:
-  port: 8080               # default Spring Boot port
-
-  spring:
-  datasource:
-    url: ${SPRING_DATASOURCE_URL:jdbc:mysql://localhost:3306/roommate}
-    username: ${SPRING_DATASOURCE_USERNAME:root}
-    password: ${SPRING_DATASOURCE_PASSWORD:root}
-
-#jwt:
-  #secret: ${JWT_SECRET:supersecret}
-  #expiration: 86400000   # 1 day in ms
-  
+  port: 8080
