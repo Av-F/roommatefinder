@@ -35,11 +35,18 @@ public class SecurityConfig {
                 .accessDeniedHandler(customAccessDeniedHandler)
             )
             .authorizeHttpRequests(auth -> auth
+                // Allow public access to static resources
+                .requestMatchers("/", "/index.html", "/css/**", "/js/**", "/images/**").permitAll()
+                // Allow public access to auth endpoints
                 .requestMatchers("/api/auth/**").permitAll()
                 .requestMatchers("/test/**").permitAll()
                 .requestMatchers("/api/users/test").permitAll()
+                // Allow H2 console access (for development)
+                .requestMatchers("/h2-console/**").permitAll()
+                // All other requests require authentication
                 .anyRequest().authenticated()
             )
+            .headers(headers -> headers.frameOptions(frame -> frame.disable()))
             .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();

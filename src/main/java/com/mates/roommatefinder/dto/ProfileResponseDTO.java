@@ -11,6 +11,7 @@ import lombok.Data;
 @Builder
 public class ProfileResponseDTO {
     private Long id;
+    private Long userId;
     private String name;
     private String lookingForOption;
     private String bio;
@@ -23,6 +24,7 @@ public class ProfileResponseDTO {
 
         return ProfileResponseDTO.builder()
                 .id(profile.getId())
+                .userId(profile.getUser() != null ? profile.getUser().getId() : null)
                 .name(profile.getName())
                 .bio(profile.getBio())
                 .age(profile.getAge())
