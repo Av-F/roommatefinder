@@ -31,13 +31,16 @@ public class ProfileService {
         throw new RuntimeException("Profile already exists for user ID: " + user.getId());
     }
 
+    // Normalize city: capitalize first letter, lowercase rest
+    String normalizedCity = normalizeCityName(dto.getCity());
+
     Profile profile = Profile.builder()
             .user(user)
             .name(dto.getName())
             .lookingForOption(dto.getLookingForOption())
             .bio(dto.getBio())
             .age(dto.getAge())
-            .city(dto.getCity())
+            .city(normalizedCity)
             .build();
 
     return profileRepository.save(profile);
@@ -82,10 +85,23 @@ public class ProfileService {
         if (dto.getName() != null) profile.setName(dto.getName());
         if (dto.getBio() != null) profile.setBio(dto.getBio());
         if (dto.getAge() != null) profile.setAge(dto.getAge());
-        if (dto.getCity() != null) profile.setCity(dto.getCity());
+        if (dto.getCity() != null) {
+            // Normalize city: capitalize first letter, lowercase rest
+            String normalizedCity = normalizeCityName(dto.getCity());
+            profile.setCity(normalizedCity);
+        }
         if (dto.getLookingForOption() != null) profile.setLookingForOption(dto.getLookingForOption());
 
         return profileRepository.save(profile);
+    }
+
+    // Helper method to normalize city names
+    private String normalizeCityName(String city) {
+        if (city == null || city.isEmpty()) {
+            return city;
+        }
+        // Capitalize first letter, lowercase the rest
+        return city.trim().substring(0, 1).toUpperCase() + city.trim().substring(1).toLowerCase();
     }
 
 }
