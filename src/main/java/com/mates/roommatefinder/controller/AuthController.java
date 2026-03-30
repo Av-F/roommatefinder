@@ -13,6 +13,7 @@ import com.mates.roommatefinder.dto.AuthResponse;
 import com.mates.roommatefinder.model.User;
 import com.mates.roommatefinder.repository.UserRepository;
 import com.mates.roommatefinder.security.JwtUtils;
+import com.mates.roommatefinder.security.UserRole;
 
 import lombok.RequiredArgsConstructor;
 
@@ -37,6 +38,9 @@ public class AuthController {
 
             // Hash password
             user.setPassword(passwordEncoder.encode(user.getPassword()));
+
+            // Set the default role to USER
+            user.setRole(UserRole.USER);
 
             // Save user
             User savedUser = userRepository.save(user);
