@@ -66,8 +66,6 @@ The application will start on `http://localhost:8080`.
   - JDBC URL: `jdbc:h2:mem:testdb`
   - Username: `sa` (no password)
 
-- **Production**: Configure MySQL connection in `application.properties`
-
 ## Project Structure
 
 ```
@@ -75,7 +73,7 @@ src/
 ├── main/
 │   ├── java/
 │   │   └── com/mates/roommatefinder/
-│   │       ├── config/          # Security & JWT configuration
+│   │       ├── config/          # Security & JWT configuration (in theory, need to move things out of security in time)
 │   │       ├── controller/       # REST endpoints
 │   │       ├── dto/              # Data Transfer Objects
 │   │       ├── model/            # JPA entities
@@ -84,7 +82,7 @@ src/
 │   │       └── service/          # Business logic
 │   └── resources/
 │       └── application.properties  # Configuration
-└── test/
+└── test/ (no coverage yet beyond postman tests)
     └── java/
         └── com/mates/roommatefinder/
             └── RoommatefinderApplicationTests.java
