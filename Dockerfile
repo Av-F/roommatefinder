@@ -1,36 +1,32 @@
-# ========================
 # Stage 1: Build
-# ========================
-FROM maven:3.9.2-eclipse-temurin-17 AS builder
+FROM maven:3.9.4-eclipse-temurin-17 AS builder
 
 # Set working directory
 WORKDIR /app
 
-# Copy pom.xml first to leverage Docker cache
+# Copy only the pom.xml first to leverage Docker cache for dependencies
 COPY pom.xml .
 
-# Download dependencies only (speeds up rebuilds)
+# Download dependencies (this speeds up subsequent builds)
 RUN mvn dependency:go-offline
 
-# Copy source code
+# Copy the entire project
 COPY src ./src
 
-# Build the application
+# Build the project (skip tests for faster builds)
 RUN mvn clean package -DskipTests
 
-# ========================
 # Stage 2: Run
-# ========================
-FROM eclipse-temurin:17-jre
+FROM eclipse-temurin:17-jdk-jammy
 
 # Set working directory
 WORKDIR /app
 
-# Copy the built jar from the builder stage
-COPY --from=builder /app/target/roommatefinder-0.0.1-SNAPSHOT.jar app.jar
+# Copy the jar built in the previous stage
+COPY --from=builder /app/target/roommatefinder-0.0.1-SNAPSHOT.jar ./roommatefinder.jar
 
-# Expose port your Spring Boot app runs on
+# Expose the port your Spring Boot app runs on
 EXPOSE 8080
 
-# Run the jar
-ENTRYPOINT ["java","-jar","app.jar"]
+# Set the entry point
+ENTRYPOINT ["java","-jar","roommatefinder.jar"]
