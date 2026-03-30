@@ -1,10 +1,11 @@
 package com.mates.roommatefinder.dto;
 
-import lombok.Getter;
-import lombok.Setter;
-
-@Getter
-@Setter
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class ProfileUpdateDTO {
     private String name;
     private String bio;
