@@ -1,35 +1,28 @@
-# Use Maven + JDK 17 image for building
-FROM maven:3.9.3-eclipse-temurin-17 AS build
-
-# Set working directory
+# Stage 1: Build
+FROM maven:3.9.3-eclipse-temurin-17 AS builder
 WORKDIR /app
 
-# Copy only Maven files first to leverage Docker cache
+# Copy pom first to leverage caching
 COPY pom.xml .
 COPY mvnw .
 COPY .mvn .mvn
+RUN mvn dependency:go-offline
 
-# Download dependencies (caches better)
-RUN mvn dependency:go-offline -B
-
-# Copy the rest of the source code
+# Copy all source files
 COPY src ./src
 
-# Build the application (skip tests to speed up)
+# Build the app, skip tests for faster builds
 RUN mvn clean package -DskipTests
 
-# ---------------------------
-# Stage 2: runtime image
-# ---------------------------
-FROM eclipse-temurin:17-jdk-alpine
-
+# Stage 2: Run
+FROM eclipse-temurin:17-jre
 WORKDIR /app
 
-# Copy the built jar from previous stage
-COPY --from=build /app/target/roommatefinder-0.0.1-SNAPSHOT.jar ./app.jar
+# Copy the JAR from builder stage
+COPY --from=builder /app/target/*.jar app.jar
 
-# Expose default Spring Boot port
+# Expose port 8080
 EXPOSE 8080
 
-# Run the app
-ENTRYPOINT ["java","-jar","app.jar"]
+# Run the application
+ENTRYPOINT ["java", "-jar", "app.jar"]
