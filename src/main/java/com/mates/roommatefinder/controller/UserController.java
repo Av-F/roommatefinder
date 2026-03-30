@@ -117,12 +117,7 @@ public class UserController {
     /**
      * Get all users for browsing/discovery
      * ADMIN ONLY - Requires ROLE_ADMIN authority
-     * 
-     * PRODUCTION NOTE: In a production environment, you should consider:
-     * - Implementing pagination: @RequestParam(defaultValue="0") int page
-     * - Filtering by preferences/location
-     * - Rate limiting to prevent abuse
-     * - Caching expensive queries
+     * This endpoint is intended for administrative purposes and should not be exposed to regular users.
      */
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/retrieve")
