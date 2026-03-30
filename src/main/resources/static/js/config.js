@@ -15,7 +15,7 @@ function getDynamicApiUrl() {
     }
     
     // Production - Update this with your Render backend URL
-    return 'https://roommatefinder-t06b.onrender.com';
+    return 'https://roommatefinder-t06b.onrender.com/api';
 }
 
 // Utility function to check if user is authenticated
