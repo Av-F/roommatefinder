@@ -1,10 +1,23 @@
 // Configuration
 const CONFIG = {
-    API_BASE_URL: 'http://localhost:8080/api',
+    // Auto-detect API URL based on environment
+    API_BASE_URL: getDynamicApiUrl(),
     TOKEN_KEY: 'roommatefinder_token',
     USER_KEY: 'roommatefinder_user',
     TIMEOUT: 10000,
 };
+
+// Detect API URL based on current location
+function getDynamicApiUrl() {
+    // Local development
+    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+        return 'http://localhost:8080/api';
+    }
+    
+    // Production - Update this with your Render backend URL
+    // Format: https://yourapp.onrender.com/api
+    return 'https://YOUR_RENDER_APP_URL.onrender.com/api';
+}
 
 // Utility function to check if user is authenticated
 function isAuthenticated() {
