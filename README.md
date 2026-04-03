@@ -1,4 +1,7 @@
-# Roommate Finder
+# Roommate Finder/Mates backend
+
+Try here!
+https://av-f.github.io/mates/#/
 
 A Spring Boot application for discovering and connecting with potential roommates. Users can register, create detailed profiles, and search for compatible living partners based on location, age, and preferences.
 
@@ -89,13 +92,11 @@ src/
 ```
 
 ## Future Enhancements
+- junit test cases for the service class and make sure that code coverage was 100% in both the controller and service classes.
+- Include more specific models for the inclusion of pictures, lease information, account deletion
+- Swtich to a MySQL database
+- optimization of my imports and remove any possible extraneous code not needed in the project
 
-- Combine multiple search filters simultaneously
-- Add profile updates and deletion
-- Implement user matching algorithm
-- Add messaging/chat functionality
-- Integrate with location-based services
-- Add comprehensive unit and integration tests
 
 ## License
 
@@ -103,7 +104,7 @@ This project is open source and available under the MIT License.
 
 ## Author
 
-Avi
+Avraham
 
 ---
 
