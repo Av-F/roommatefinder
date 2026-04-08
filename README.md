@@ -1,4 +1,4 @@
-# Roommate Finder/Mates backend
+# Mates backend
 
 Try here!
 https://av-f.github.io/mates/#/
